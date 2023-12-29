@@ -723,6 +723,67 @@ class ManagerController {
 
     }
 
+    post_danh_sach_don(req, res, next) {
+        var tu_ngay = req.body.tu_ngay;
+        var den_ngay = req.body.den_ngay;
+         var postal_office_code = req.user_data.postal_office_code;
+        console.log(tu_ngay, den_ngay, postal_office_code);
+
+        var [day, month, year] = tu_ngay.split('/');
+        const startTime = new Date(`${year}/${month}/${day}`);
+        var [day, month, year] = den_ngay.split('/');
+        const endTime = new Date(`${year}/${month}/${parseInt(day)+1}`);
+        console.log(startTime, endTime)
+        Parcels.find({
+            trang_thai: {
+                $elemMatch: {
+                    time: { $gte: startTime, $lte: endTime},
+                    // postal_office_code: postal_office_code
+                }
+            }
+        })
+        .then(data => {
+            console.log(data.length)
+            if(data.length != 0) {
+                var number_format = function(number) {
+                    if(number.toString().length < 2){
+                        return `0${number.toString()}`;
+                    } else {
+                        return number;
+                    }
+                }
+                for(var i = 0; i< data.length; i++) {
+                    data[i] = data[i].toObject();
+                    var time = data[i].trang_thai[0].time;
+                    var ngay = `${number_format(time.getDate())}/${number_format(time.getMonth() + 1)}/${time.getFullYear()}`;
+                    var gio = `${number_format(time.getHours())}:${number_format(time.getMinutes())}:${number_format(time.getSeconds())}`;
+
+                    
+                    var trang_thai_hien_tai = data[i].trang_thai[data[i].trang_thai.length-1].trang_thai;
+                    var vi_tri_hien_tai = data[i].trang_thai[data[i].trang_thai.length-1].vi_tri;
+                    var vi_tri_hien_tai_2 = data[i].trang_thai[data[i].trang_thai.length-1].postal_office_code;
+                    data[i].ngay = ngay;
+                    data[i].gio = gio;
+                    data[i].trang_thai_hien_tai = trang_thai_hien_tai;
+                    data[i].vi_tri_hien_tai = vi_tri_hien_tai;
+                    data[i].vi_tri_hien_tai_2 = vi_tri_hien_tai_2;
+                }
+                res.json({
+                    message: true,
+                    data: data
+                })
+            } else {
+                res.json({
+                    message: false,
+                })
+            }
+        })
+        .catch(err => console.log(err))
+    }
+
+    show_danh_sach(req, res, next) {
+        res.render('./manager_view/product_list', {manager_header, noFooter: true})
+    }
 }
 
 export default new ManagerController;

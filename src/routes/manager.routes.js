@@ -20,6 +20,8 @@ router.post('/addWarehouse', ManagerController.addWarehouse)
 router.get('/getSingleWarehouse/:id', ManagerController.getSingleWarehouse)
 router.post('/editWarehouse/:id', ManagerController.editWarehouse)
 router.delete('/deleteWarehouse/', ManagerController.deleteWarehouse)
+router.get('/danh_sach_don', ManagerController.show_danh_sach)
+router.post('/danh_sach_don', ManagerController.post_danh_sach_don)
 router.get('/', ManagerController.showList)
 
 export default router;
