@@ -293,3 +293,16 @@ label {
     margin: 0px; }
   .table-title .btn {
     float: left; } }
+
+#filter {
+  margin-top: 10px; }
+
+#filter select {
+  max-width: 160px; }
+
+#filter .fa-search {
+  margin-top: 5px;
+  margin-left: 5px; }
+
+#filter .fa-search:hover {
+  cursor: pointer; }

@@ -77,8 +77,11 @@ app.engine(
       },
       eq: function (a, b) {
         return (a === b);
-      }
+      },
 
+      check: function(a) {
+        return a != '';
+      }
 
     }
   }));

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {{!--
+    <link rel="stylesheet" href="home.css"> --}}
+    <link rel="stylesheet" href="/css/transation_manager.css">
+    <link rel="stylesheet" href="/css/transation_staff.css">
+    <link rel="stylesheet" href="/css/list_staff.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function () {
+                if (this.checked) {
+                    checkbox.each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    checkbox.each(function () {
+                        this.checked = false;
+                    });
+                }
+            });
+            checkbox.click(function () {
+                if (!this.checked) {
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="page_container">
+        <main class="main_content">
+            <div class="full_container">
+                <div class="table-title">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="content_title">
+                                <div>
+                                    DANH SÁCH ĐIỂM GIAO DỊCH
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"
+                                onclick="cleanForm('addEmployeeModal')"><i class="material-icons">&#xE147;</i>
+                                <span>Thêm điểm giao dịch</span></a>
+                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"
+                                onclick="setValue('')"><i class="material-icons">&#xE15C;</i> <span>Xóa</span></a>
+                        </div>
+                    </div>
+                </div>
+                {{!-- <div id="filter">
+                    <div style="display: flex;">
+                        <select class="form-select form-select-sm mb-3" id="city" aria-label=".form-select-sm">
+                            <option value="" selected>Chọn tỉnh thành</option>
+                        </select>
+
+                        <select class="form-select form-select-sm mb-3" id="district" aria-label=".form-select-sm">
+                            <option value="" selected>Chọn quận huyện</option>
+                        </select>
+
+                        <select class="form-select form-select-sm mb-3" id="ward" aria-label=".form-select-sm">
+                            <option value="" selected>Chọn phường xã</option>
+                        </select>
+                        <i class="fa fa-search fa-lg" aria-hidden="true" onclick="getFilter()"></i>
+                    </div>
+                </div> --}}
+                <div class="container-xl">
+                    <div class="table-responsive">
+                        <div class="table-wrapper list_container">
+                            <table class="table table-striped table-hover container_product_list list_staff">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <span class="custom-checkbox">
+                                                <input type="checkbox" id="selectAll">
+                                                <label for="selectAll"></label>
+                                            </span>
+                                        </th>
+                                        <th>Điểm giao dịch</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Kho liên kết</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each list}}
+                                    {{!-- {{#each this}} --}}
+                                    <tr>
+                                        <td>
+                                            <span class="custom-checkbox">
+                                                <input type="checkbox" id="{{_id}}" name="options[]" value="1">
+                                                <label for="checkbox1"></label>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{this.name}}
+                                        </td>
+                                        <td>
+                                            {{this.street}}-{{this.commune}}-{{this.district}}-{{this.city}}
+                                        </td>
+                                        <td>
+                                            {{this.phone_number}}
+                                        </td>
+                                        <td>
+                                            {{this.name_warehouse}}
+                                        </td>
+                                        <td>
+                                            <a href="#editEmployeeModal" class="edit" data-toggle="modal"
+                                                onclick="prepareData('{{_id}}')"><i class="material-icons"
+                                                    data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
+                                                onclick="setValue('{{_id}}')"><i class="material-icons"
+                                                    data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                        </td>
+
+                                    </tr>
+                                    {{!-- {{/each}} --}}
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="addEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thêm điểm giao dịch</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Tên bưu cục</label>
+                            <input type="text" class="form-control form-name" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Tỉnh</label>
+                            <select class="form-select form-select-sm mb-3" id="city" aria-label=".form-select-sm">
+                                <option value="" selected>Chọn tỉnh thành</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Quận huyện</label>
+                            <select class="form-select form-select-sm mb-3" id="district" aria-label=".form-select-sm">
+                                <option value="" selected>Chọn quận huyện</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Thị xã</label>
+                            <select class="form-select form-select-sm" id="ward" aria-label=".form-select-sm">
+                                <option value="" selected>Chọn phường xã</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đường</label>
+                            <input type="text" class="form-control form-email form-street" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="tel" class="form-control form-username form-phone" pattern="[0-9]{1}[0-9]{9}"
+                                required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Kho liên kết</label>
+                            <select class="form-select form-select-sm" id="warehouse" aria-label=".form-select-sm">
+                                <option value="" selected>Chọn kho liên kết</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-success" value="Thêm">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal HTML -->
+    <div id="editEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Chỉnh sửa điểm giao dịch</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" class="form-id" hidden>
+                        <div class="form-group">
+                            <label>Tên bưu cục</label>
+                            <input type="text" class="form-control form-name" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="tel" class="form-control form-username form-phone" pattern="[0-9]{1}[0-9]{9}"
+                                required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Kho liên kết</label>
+                            <select class="form-select form-select-sm" id="warehouse" aria-label=".form-select-sm">
+                                <option value="" selected>Chọn kho liên kết</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-success" value="Sửa">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Modal HTML -->
+    <div id="deleteEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Xóa điểm giao dịch</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" disabled readonly hidden>
+                        <p>Bạn chắc chắn muốn xóa những điểm giao dịch này?</p>
+                        <p class="text-warning"><small>Hành động này không thể được hoàn tác.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-danger" value="Xóa">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+<script>
+    function setValue(value) {
+        var temp = document.getElementById('deleteEmployeeModal');
+        var input = temp.querySelector('.modal-body input');
+        input.value = value;
+    }
+    function getValue() {
+        var temp = document.getElementById('deleteEmployeeModal');
+        var input = temp.querySelector('.modal-body input');
+        return input.value;
+    }
+</script>
+
+<script>
+    function cleanForm(id) {
+        var form = document.getElementById(id);
+        var input = form.querySelectorAll('input.form-control');
+        var error = form.querySelectorAll('.error');
+        var select = form.querySelectorAll('select');
+        for (let e of input) {
+            e.value = '';
+        }
+        for (let e of error) {
+            e.innerHTML = '';
+        }
+
+     //   for (let e of select) {
+      //      for (var i = e.length - 1; i > 0; i--) {
+      //          e.options.remove(i);
+      //      }
+       // }
+    }
+</script>
+
+{{!-- Add account --}}
+
+<script>
+    function showOverlay(form_id) {
+        var form = document.getElementById(form_id);
+        form.classList.add('form-loading');
+
+        const overlay = form.querySelector('#loadingOverlay');
+        overlay.style.display = 'block';
+
+        // const loadingText = document.createElement('div');
+        // loadingText.className = 'loading-text';
+        // loadingText.innerHTML = 'Đang xử lý...';
+        // overlay.appendChild(loadingText);
+    }
+
+    function hideOverlay(form_id) {
+        var form = document.getElementById(form_id);
+        form.classList.remove('form-loading');
+
+        const overlay = form.querySelector('#loadingOverlay');
+        overlay.style.display = 'none';
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('addEmployeeModal');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form_id = 'addEmployeeModal';
+            showOverlay(form_id);
+            var name = form.querySelector('input.form-name').value;
+            var street = form.querySelector('input.form-street').value;
+            var phone = form.querySelector('input.form-phone').value;
+            var city_option = form.querySelector('#city');
+            var city = '';
+            for (var e of city_option) {
+                if (e.selected && e.value != "") {
+                    city = e.innerHTML;
+                    break;
+                }
+            }
+            var district_option = form.querySelector('#district');
+            var district = '';
+            for (var e of district_option) {
+                if (e.selected && e.value != "") {
+                    district = e.innerHTML;
+                    break;
+                }
+            }
+            var ward_option = form.querySelector('#ward');
+            var ward = '';
+            for (var e of ward_option) {
+                if (e.selected && e.value != "") {
+                    ward = e.innerHTML;
+                    break;
+                }
+            }
+
+            var warehouse_option = form.querySelector('#warehouse');
+            var warehouse = '';
+            for (var e of warehouse_option) {
+                if (e.selected) {
+                    warehouse = e.value;
+                    // warehouse = warehouse.toString();
+                    break;
+                }
+            }
+            $.ajax({
+                url: '/manager/addTransaction',
+                method: 'POST',
+                data: {
+                    name: name,
+                    street: street,
+                    city: city,
+                    district: district,
+                    commune: ward,
+                    phone: phone,
+                    warehouse: warehouse
+                }
+            })
+                .done(res => {
+                    // console.log(res);
+                    if (res.status) {
+                        alert("Thêm điểm giao dịch " + res.message);
+                        // console.log('Hahahaha')
+                        location.reload();
+                    } else {
+                        var temp = warehouse_option.nextElementSibling;
+                        console.log(temp);
+                        temp.innerHTML = res.message;
+                        hideOverlay(form_id);
+
+                    }
+                }
+                )
+                .fail(err => {
+                    console.log(err);
+                })
+
+        });
+    });
+</script>
+
+{{!-- Edit account --}}
+
+<script>
+    function prepareData(id) {
+        cleanForm('editEmployeeModal');
+
+        $.ajax(
+            {
+                url: '/manager/getTransaction/' + id,
+                method: 'GET',
+            }
+        )
+            .done(response => {
+                console.log(response);
+                var data = response.data;
+                var name = data.name;
+                var phone = data.phone_number;
+                var city = data.city;
+                var id = data._id;
+                var warehouse = data.to_warehouse;
+                var form = document.getElementById('editEmployeeModal');
+                var form_id = form.querySelector('input.form-id');
+                var form_name = form.querySelector('input.form-name');
+                var form_phone = form.querySelector('input.form-phone');
+                form_id.value = id;
+                form_name.value = name;
+                form_phone.value = phone;
+                var warehouse_option = form.querySelector('#warehouse');
+                // con
+                var list_warehouse = response.warehouse;
+                for (var i = 0; i < list_warehouse.length; i++) {
+                    warehouse_option.options[i + 1] = new Option(list_warehouse[i].name, list_warehouse[i]._id);
+                    if (list_warehouse[i]._id == warehouse) {
+                        warehouse_option.options[i + 1].selected = true;
+                    }
+                }
+            })
+
+            .fail(err => {
+                console.log(err);
+            })
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var form = document.getElementById('editEmployeeModal');
+
+        // Bắt sự kiện (ví dụ: click) và ngăn chặn sự kiện mặc định
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form_id = 'editEmployeeModal';
+            showOverlay(form_id);
+            var id = form.querySelector('input.form-id').value;
+            var name = form.querySelector('input.form-name').value;
+            var phone = form.querySelector('input.form-phone').value;
+            var warehouse_option = form.querySelector('#warehouse');
+            var warehouse = '';
+            for (var e of warehouse_option.options) {
+                if (e.selected) {
+                    warehouse = e.value;
+                    break;
+                }
+            }
+            $.ajax({
+                url: '/manager/editTransaction/' + id,
+                method: 'POST',
+                data: {
+                    name: name,
+                    phone: phone,
+                    warehouse: warehouse,
+                }
+            })
+                .done(res => {
+                    // console.log(res);
+                    if (res.status) {
+                        alert("Sửa tài khoản thành công");
+                        // console.log('Hahahaha')
+                        location.reload();
+                    } else {
+                        hideOverlay(form_id);
+                        var temp = form.querySelectorAll('.form-group input');
+                        var temp = warehouse_option.nextElementSibling;
+                        console.log(temp);
+                        temp.innerHTML = res.message;
+                    }
+                }
+                )
+                .fail(err => {
+                    console.log(err);
+                })
+
+        });
+    });
+</script>
+
+{{!-- Delete account --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var form = document.getElementById('deleteEmployeeModal');
+
+        // Bắt sự kiện (ví dụ: click) và ngăn chặn sự kiện mặc định
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var tbody = document.querySelector('table tbody');
+            var inputs = tbody.querySelectorAll('.custom-checkbox input');
+            var list_id = [];
+            var value = getValue();
+            if (value == '') {
+                for (var e of inputs) {
+                    if (e.checked) {
+                        list_id.push(e.id);
+                    }
+                }
+            } else {
+                list_id.push(value);
+            }
+            showOverlay('deleteEmployeeModal');
+            if (!list_id.length) {
+                alert("Lỗi: Không có phần tử nào để xóa!");
+                location.reload();
+            } else {
+                $.ajax({
+                    url: '/manager/deleteTransaction',
+                    method: "DELETE",
+                    data: {
+                        list: list_id,
+                    }
+                })
+                    .done(res => {
+                        alert("Xóa thành công " + list_id.length + " điểm giao dịch.");
+                        location.reload();
+                    })
+                    .fail(err => {
+                        alert(err);
+                        location.reload();
+                    })
+            }
+        });
+    });
+</script>
+
+{{!-- Lọc dịa điểm --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    function getLocation(id) {
+        var form = document.getElementById(id);
+        var citis = form.querySelector("#city");
+        var districts = form.querySelector("#district");
+        var wards = form.querySelector("#ward");
+        var warehouse = form.querySelector("#warehouse");
+        var Parameter = {
+            url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+            method: "GET",
+            responseType: "application/json",
+        };
+        var promise = axios(Parameter);
+        promise.then(function (result) {
+            renderCity(result.data);
+        });
+
+        function renderCity(data) {
+            for (const x of data) {
+                citis.options[citis.options.length] = new Option(x.Name, x.Id);
+            }
+            citis.onchange = function () {
+                district.length = 1;
+                ward.length = 1;
+                if (this.value != "") {
+                    const result = data.filter(n => n.Id === this.value);
+
+                    for (const k of result[0].Districts) {
+                        district.options[district.options.length] = new Option(k.Name, k.Id);
+                    }
+
+                    if (warehouse !== null && warehouse !== undefined) {
+                        // console.log(warehouse);
+                        // var index = this.value;
+                        // console.log(parseInt(this.value));
+                        // console.log(citis.options);
+                        $.ajax({
+                            url: '/manager/getWarehouse',
+                            method: 'POST',
+                            data: {
+                                city: citis.options[parseInt(this.value)].innerHTML,
+                                commune: '',
+                                district: '',
+
+                            }
+                        }
+                        )
+                            .done(response => {
+                                // console.log(data);
+                                var data = response.data;
+                                for (var i = warehouse.options.length - 1; i > 0; i--) {
+                                    warehouse.options.remove(i);
+                                }
+                                for (var i = 0; i < data.length; i++) {
+                                    warehouse.options[i + 1] = new Option(data[i].name, data[i]._id);
+                                }
+                            })
+                            .fail(err => {
+                                console.log(err);
+                            })
+                    }
+
+                }
+            };
+            district.onchange = function () {
+                ward.length = 1;
+                const dataCity = data.filter((n) => n.Id === citis.value);
+                if (this.value != "") {
+                    const dataWards = dataCity[0].Districts.filter(n => n.Id === this.value)[0].Wards;
+
+                    for (const w of dataWards) {
+                        wards.options[wards.options.length] = new Option(w.Name, w.Id);
+                    }
+                }
+            };
+        }
+    }
+</script>
+
+{{!-- init --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        getLocation('addEmployeeModal');
+        // getLocation('filter');
+    })
+</script>
+
+<script>
+    function getFilter() {
+        var filter = document.getElementById('filter');
+        var city = filter.querySelector('#city');
+        var district = filter.querySelector('#district');
+        var ward = filter.querySelector('#ward');
+    }
+</script>
+
+</html>

@@ -41,6 +41,7 @@
     var form = new Validator('#formLogin');
     form.onSubmit = function (formData) {
         console.log(formData)
+        // console.log("dmm");
         login();
     }
 
@@ -66,7 +67,7 @@
             })
             .fail(function (err) {
                 console.log("loi")
-                { { !--console.log(err) --} }
+                // { { !--console.log(err) --} }
             })
             .always(function (data) {
                 var inputs = $('[name][rules]');

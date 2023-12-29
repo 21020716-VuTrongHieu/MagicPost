@@ -6,6 +6,8 @@ import Parcel_bags from "../models/Parcel_bags.js";
 import jwt from 'jsonwebtoken';
 import Users from '../models/User.js'
 import Validation from '../controllers/checkForm.js';
+
+
 const manager_header = true;
 
 class ManagerController {
@@ -61,16 +63,16 @@ class ManagerController {
 
                     Promise.all(promiseList)
                         .then(tmp => {
-                            res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, noi_gui, noi_nhan, trang_thai, list_trang_thai, data, manager_header })
+                            res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, noi_gui, noi_nhan, trang_thai, list_trang_thai, data, manager_header, noFooter: true })
                         })
 
                 } else {
-                    res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, manager_header })
+                    res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, manager_header, noFooter: true })
                 }
             })
             .catch(err => {
 
-                res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, manager_header })
+                res.render('./manager_view/tra_cuu_don', { found_parcel, tracking_code, manager_header, noFooter: true })
             });
 
         // res.render('./transaction_staff_view/tra_cuu_don', {transaction_staff_header})
@@ -142,19 +144,19 @@ class ManagerController {
         var user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         var user_id = user._id;
         var list = ["warehouse_manager", "transaction_manager"];
-    
+
         Users.find({ role: { $in: list } }).then(async (data) => {
-    
+
             // Assuming postal_office_code is a field in the Users collection
             const updatedData = await Promise.all(data.map(async (acc) => {
                 var post_code = acc.postal_office_code;
-    
+
                 const postalOffice = await Postal_office.findOne({ _id: post_code });
-    
+
                 const postalOfficeName = postalOffice ? postalOffice.name : 'Unknown Postal Office';
                 var info = acc.toObject();
                 info.postal_name = postalOfficeName;
-                return info;  
+                return info;
             }));
             console.log(updatedData);
             data = updatedData;
@@ -404,6 +406,323 @@ class ManagerController {
             res.status(400).json({ error: 'Invalid workspace' });
         }
     }
+
+    getListTransaction(req, res, next) {
+        Postal_office.find()
+            .then(data => {
+                // console.log(data);
+                data = data.map(data => data.toObject());
+                var warehouse = data.filter(data => data.role === 'warehouse');
+                var transaction = data.filter(data => data.role === 'postal_office');
+                // console.log(warehouse);
+                // console.log(transaction);
+                for (var e of transaction) {
+                    var search = warehouse.find(warehouse => warehouse._id.toString() == e.to_warehouse.toString());
+                    if (search === undefined || search === null) {
+                        res.status(500).send("Lỗi server!");
+                        return;
+                    }
+                    e.name = e.name.trim();
+                    e.street = e.street.trim();
+                    e.phone_number = e.phone_number.trim();
+                    e.city = e.city.trim();
+                    e.district = e.district.trim();
+                    e.commune = e.commune.trim();
+                    e.name_warehouse = search.name;
+                }
+                // console.log(transaction);
+                res.render('./manager_view/list_transaction', { list: transaction, manager_header: true, noFooter: true });
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            })
+    }
+
+    getWarehouse(req, res, next) {
+        var city = req.body.city;
+        var commune = req.body.commune;
+        var district = req.body.district;
+        console.log(typeof city);
+        city = city.toObject();
+        city = city.toString();
+        city = city.replace(/(Thành phố|Tỉnh)/, '').trim();
+        district = district.replace(/(Thị xã|Quận|Huyện|Thành phố)/, '').trim();
+        commune = commune.replace(/(Thị trấn|Phường|Xã)/, '').trim();
+        console.log(city);
+        Postal_office.find({ role: 'warehouse' })
+            .then(data => {
+                data = data.map(data => data.toObject());
+                console.log(data);
+                if (city != '') {
+                    data = data.filter(data => data.city === city);
+                    if (district != '') {
+                        data = data.filter(data => data.district === district);
+                        if (commune != '') {
+                            data = data.filter(data => data.commune === commune);
+                            res.json({ data: data });
+                        } else {
+                            res.json({ data: data });
+                        }
+                    } else {
+                        res.json({ data: data });
+                    }
+                } else {
+                    res.json({ data: data });
+                }
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            })
+    }
+
+    addTransaction(req, res, next) {
+        var city = req.body.city;
+        var commune = req.body.commune;
+        var district = req.body.district;
+        city = city.replace(/(Thành phố|Tỉnh)/, '').trim();
+        district = district.replace(/(Thị xã|Quận|Huyện|Thành phố)/, '').trim();
+        commune = commune.replace(/(Thị trấn|Phường|Xã)/, '').trim();
+        var name = req.body.name;
+        name = name.trim();
+        var street = req.body.street;
+        street = street.trim();
+        var phone = req.body.phone;
+        var warehouse = req.body.warehouse;
+        if (city == '' || commune == '' || district == '' || warehouse == '') {
+            res.json({
+                status: false,
+                message: "Bạn chưa điền đủ thông tin!"
+            })
+        } else {
+            Postal_office.find({ city: city, commune: commune, district: district, role: 'postal_office' })
+                .then(data => {
+                    if (data.length) {
+                        res.json({
+                            status: false,
+                            message: "Địa điểm này đã có bưu cục!"
+                        })
+                    } else {
+                        var post = {
+                            name: name,
+                            city: city,
+                            commune: commune,
+                            district: district,
+                            phone_number: phone,
+                            street: street,
+                            role: 'postal_office',
+                            to_warehouse: warehouse
+                        }
+                        Postal_office.create(post)
+                            .then(() => {
+                                res.json({
+                                    status: true,
+                                    message: 'thành công!'
+                                })
+                            })
+                            .catch(err => {
+                                res.json({
+                                    status: true,
+                                    message: 'thất bại!'
+                                })
+                            })
+                    }
+                })
+                .catch(err => {
+                    res.status(500).send(err);
+                })
+        }
+    }
+    getTransaction(req, res, next) {
+        var id = req.params.id;
+        Postal_office.find()
+            .then(data => {
+                data = data.map(data => data.toObject());
+                var warehouse = data.filter(data => data.role === 'warehouse');
+                data = data.find(data => data._id == id);
+                warehouse = warehouse.filter(warehouse => warehouse.city == data.city)
+                res.json({
+                    data: data,
+                    warehouse: warehouse
+                })
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            })
+
+    }
+    editTransaction(req, res, next) {
+        var id = req.params.id;
+        var name = req.body.name;
+        name = name.trim();
+        var phone = req.body.phone;
+        var warehouse = req.body.warehouse;
+        if (warehouse === null || warehouse === undefined || warehouse == '') {
+            res.json({
+                status: false,
+                message: 'Bạn chưa điền đủ thông tin'
+            })
+        } else {
+            Postal_office.updateOne({ _id: id }, { name: name, phone_number: phone, to_warehouse: warehouse })
+                .then(() => {
+                    res.json({
+                        status: true
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        status: true,
+                        message: err
+                    })
+                })
+        }
+
+    }
+    deleteTransaction(req, res, next) {
+        var list = req.body.list;
+        Postal_office.deleteMany({ _id: { $in: list } })
+            .then(() => {
+                Users.deleteMany({
+                    postal_office_code: { $in: list }
+                })
+                    .then(() => {
+                        res.json({
+                            status: true,
+                        })
+                    })
+            }
+
+
+            )
+
+    }
+
+    getListWarehouse(req, res, next) {
+        Postal_office.find()
+            .then(data => {
+                // console.log(data);
+                data = data.map(data => data.toObject());
+                var warehouse = data.filter(data => data.role === 'warehouse');
+                // console.log(transaction);
+                res.render('./manager_view/list_warehouse', { list: warehouse, manager_header: true, noFooter: true });
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            })
+    }
+
+    addWarehouse(req, res, next) {
+        var city = req.body.city;
+        var commune = req.body.commune;
+        var district = req.body.district;
+        city = city.replace(/(Thành phố|Tỉnh)/, '').trim();
+        district = district.replace(/(Thị xã|Quận|Huyện|Thành phố)/, '').trim();
+        commune = commune.replace(/(Thị trấn|Phường|Xã)/, '').trim();
+        var name = req.body.name;
+        name = name.trim();
+        var street = req.body.street;
+        street = street.trim();
+        var phone = req.body.phone;
+        if (city == '' || commune == '' || district == '') {
+            res.json({
+                status: false,
+                message: "Bạn chưa điền đủ thông tin!"
+            })
+        } else {
+            Postal_office.find({ city: city, commune: commune, district: district, role: 'postal_office' })
+                .then(data => {
+                    if (data.length) {
+                        res.json({
+                            status: false,
+                            message: "Địa điểm này đã có bưu cục!"
+                        })
+                    } else {
+                        var post = {
+                            name: name,
+                            city: city,
+                            commune: commune,
+                            district: district,
+                            phone_number: phone,
+                            street: street,
+                            role: 'warehouse'
+                        }
+                        console.log(post);
+                        Postal_office.create(post)
+                            .then(() => {
+                                res.json({
+                                    status: true,
+                                    message: 'thành công!'
+                                })
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                res.json({
+                                    status: true,
+                                    message: 'thất bại!'
+                                })
+                            })
+                    }
+                })
+                .catch(err => {
+                    res.status(500).send(err);
+                })
+        }
+    }
+
+    getSingleWarehouse(req, res, next) {
+        var id = req.params.id;
+        Postal_office.find()
+            .then(data => {
+                data = data.map(data => data.toObject());
+                data = data.find(data => data._id == id);
+                res.json({
+                    data: data,
+                })
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            })
+
+    }
+
+    editWarehouse(req, res, next) {
+        var id = req.params.id;
+        var name = req.body.name;
+        name = name.trim();
+        var phone = req.body.phone;
+        Postal_office.updateOne({ _id: id }, { name: name, phone_number: phone})
+            .then(() => {
+                res.json({
+                    status: true
+                })
+            })
+            .catch(err => {
+                res.json({
+                    status: true,
+                    message: err
+                })
+            })
+
+    }
+
+    deleteWarehouse(req, res, next) {
+        var list = req.body.list;
+        Postal_office.deleteMany({ _id: { $in: list } })
+            .then(() => {
+                Users.deleteMany({
+                    postal_office_code: { $in: list }
+                })
+                    .then(() => {
+                        res.json({
+                            status: true,
+                        })
+                    })
+            }
+
+
+            )
+
+    }
+
 }
 
 export default new ManagerController;
