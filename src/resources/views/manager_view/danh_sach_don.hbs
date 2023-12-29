@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {{!-- <link rel="stylesheet" href="home.css"> --}}
+    <link rel="stylesheet" href="/css/transation_staff.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+</head>
+<style>
+.check_btn {
+    background-color:rgb(150, 165, 247)!important;
+    cursor:auto!important;
+}
+</style>
+
+<body>
+    
+    <div class="page_container">
+        <main class="main_content">
+            <div id="mainContent">
+                <div class="full_container">
+                    <div class="content_title">
+                        DANH SÁCH ĐƠN TẠI BƯU CỤC
+                    </div>
+                    <div class="container_product_list">
+                        {{#if checkProduct}}
+                        <div class="nav_bar_service">
+                            {{!-- <input type="button" value="Xóa" name="delete"> --}}
+                            <input type="button" value="Tạo túi hàng" id="btn_tao_tui" class="check_btn" disabled>
+                            <!-- <input type="button" value="ALL"> -->
+                        </div>
+                        
+                        <div class="product_list" id="product_list">
+                            
+                            <table id="product_list_table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" name="all" id="check_all"></th>
+                                        <th>Bưu cục giao dịch</th>
+                                        <th>Mã đơn hàng</th>
+                                        <th>Tên khách hàng</th>
+                                        <th>Ngày tạo đơn</th>
+                                        <th>Trạng thái</th>
+                                        <th>Cập nhật trạng thái</th>
+                                        <th>Chuyến đơn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each data}}
+                                    <tr>
+                                        <td>
+                                            {{#if this.check_}}
+                                                <input type="checkbox" name="check_list" id={{this._id}} class="check_list">
+                                            {{/if}}
+                                        </td>
+                                        <td>
+                                            <span>{{this.ma_buu_cuc_giao_dich}}</span>
+                                            <span>{{this.ten_buu_cuc}}</span>
+                                        </td>
+                                        <td>{{this._id}}</td>
+                                        <td>{{this.ten_nguoi_gui}}</td>
+                                        <td>
+                                            <span>{{this.ngay_tao_don}}</span>
+                                            <span>{{this.gio_tao}}</span>
+                                        </td>
+                                        <td>{{this.trang_thai_hien_tai}}</td>
+                                        <td>
+                                            <span>
+                                                <select name="select_trang_thai" class="select_trang_thai">
+                                                    <option>--CN Trạng thái--</option>
+                                                    <option>Chấp nhận gửi</option>
+                                                    <option>Đã giao hàng</option>
+                                                    <option>Giao thất bại</option>
+                                                    <option>Thất lạc</option>
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <div class="btn_cn_trang_thai">
+                                                    <input type="button" class="cn_trang_thai check_btn" code={{this._id}} value="OK">
+                                                </div>
+                                            </span>
+                                        </td>
+                                        <td>{{this.chuyen_don}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                        {{else}}
+                        <div id="error_note" style="display:;">
+                            <i style="color: red;">*Không tìm thấy đơn hàng</i>
+                        </div>
+                        {{/if}}
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="Order_Success hidden" id="Order_Success">
+        <div class="ReactModal__Overlay ReactModal__Overlay--after-open" 
+            style="position: fixed; inset: 0px; background-color: rgba(39, 39, 42, 0.7); z-index: 999;">
+            <div class="ReactModal__Content ReactModal__Content--after-open" 
+                tabindex="-1" role="dialog" aria-modal="true" 
+                style="position: absolute; inset: 50% 40px auto 50%; border: 1px solid rgb(204, 204, 204); 
+                        background: rgb(255, 255, 255); overflow: auto; border-radius: 8px; outline: none; 
+                        padding: 16px; width: 311px; transform: translate(-50%, -50%); background-color:">
+                <div class="styles__StyledDialog-sc-10typcj-0 Pvpwm">
+                    <div class="dialog-content" style="color: rgb(56, 56, 61); margin-bottom: 24px; display: flex;">
+                        {{!-- <svg width="24" height="24" class="dialog-content__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; flex-shrink: 0;"> --}}
+                            <img src="/img/success_icon.png" alt="order_success" width="24" height="24" style="margin-right:10px;">
+                        {{!-- </svg> --}}
+                        <div class="dialog-content__text">
+                            <div class="dialog-content__title" style="font-size: 16px; line-height: 24px; font-weight: 500; margin-bottom: 8px;">Cập nhật thành công!!!</div>
+                            <div class="dialog-content__message" style="font-size: 14px; line-height: 20px; color: rgb(81, 81, 88); word-break: break-word;">Đơn hàng đã được cập nhật lại trạng thái.</div>
+                        </div>
+                    </div>
+                    <div class="dialog-control" style="display: flex; text-align: center; font-size: 14px; line-height: 20px; font-weight: 500; -webkit-box-pack: end; justify-content: flex-end;">
+                        <div id="order_page" class="dialog-control__button dialog-control__button--main" 
+                            style="padding: 8px 16px; border-radius: 4px; height: 36px; 
+                                    cursor: pointer; box-sizing: border-box; 
+                                    background-color: rgb(11, 116, 229); 
+                                    color: rgb(255, 255, 255);">Xác nhận
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="Order_failed hidden" id="Order_failed">
+        <div class="ReactModal__Overlay ReactModal__Overlay--after-open" 
+            style="position: fixed; inset: 0px; background-color: rgba(39, 39, 42, 0.7); z-index: 999;">
+            <div class="ReactModal__Content ReactModal__Content--after-open" 
+                tabindex="-1" role="dialog" aria-modal="true" 
+                style="position: absolute; inset: 50% 40px auto 50%; border: 1px solid rgb(204, 204, 204); 
+                        background: rgb(255, 255, 255); overflow: auto; border-radius: 8px; outline: none; 
+                        padding: 16px; width: 311px; transform: translate(-50%, -50%); background-color:">
+                <div class="styles__StyledDialog-sc-10typcj-0 Pvpwm">
+                    <div class="dialog-content" style="color: rgb(56, 56, 61); margin-bottom: 24px; display: flex;">
+                        {{!-- <svg width="24" height="24" class="dialog-content__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; flex-shrink: 0;"> --}}
+                            <img src="/img/cancel.png" alt="order_failed" width="24" height="24" style="margin-right:10px;">
+                        {{!-- </svg> --}}
+                        <div class="dialog-content__text">
+                            <div class="dialog-content__title" style="font-size: 16px; line-height: 24px; font-weight: 500; margin-bottom: 8px;">Cập nhật thất bại!!!</div>
+                            <div class="dialog-content__message" style="font-size: 14px; line-height: 20px; color: rgb(81, 81, 88); word-break: break-word;">Đơn hàng chưa được cập nhật lại trạng thái.</div>
+                        </div>
+                    </div>
+                    <div class="dialog-control" style="display: flex; text-align: center; font-size: 14px; line-height: 20px; font-weight: 500; -webkit-box-pack: end; justify-content: flex-end;">
+                        <div id="cart_page" class="dialog-control__button dialog-control__button--main" 
+                            style="padding: 8px 16px; border-radius: 4px; height: 36px; 
+                                    cursor: pointer; box-sizing: border-box; 
+                                    background-color: rgb(11, 116, 229); 
+                                    color: rgb(255, 255, 255);">Xác nhận</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form action="/transaction_staff/tui_hang" method="post" id="product_list_form">
+        <input type="hidden" name="product_id_list" id="input_product_id_list">
+    </form>
+</body>
+<script>
+    var table = document.getElementById('product_list_table');
+                if(table) {
+                    var check_all = document.getElementById('check_all');
+                    var check_list = document.getElementsByClassName('check_list');
+
+                    check_all.onchange = function() {
+                        for(var i = 0; i < check_list.length; i++) {
+                            check_list[i].checked = this.checked;
+                        }
+
+                        if(this.checked) {
+                            document.getElementById('btn_tao_tui').classList.remove('check_btn');
+                            document.getElementById('btn_tao_tui').removeAttribute("disabled");
+                        } else {
+                            document.getElementById('btn_tao_tui').classList.add('check_btn');
+                            document.getElementById('btn_tao_tui').setAttribute("disabled", "disabled");
+                        }
+                    }
+
+                    var check_check_all = function() {
+                        for(var j = 0; j < check_list.length; j++) {
+                            if(!check_list[j].checked) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    for(var i = 0; i < check_list.length; i++) {
+                        check_list[i].onchange = function() {
+                            if(this.checked) {
+                                if(check_check_all()) {
+                                    check_all.checked = true;
+                                }
+                            } else {
+                                check_all.checked = false;
+                            }
+
+                            if(check_btn()) {
+                                document.getElementById('btn_tao_tui').classList.remove('check_btn');
+                                document.getElementById('btn_tao_tui').removeAttribute("disabled");
+                            } else {
+                                document.getElementById('btn_tao_tui').classList.add('check_btn');
+                                document.getElementById('btn_tao_tui').setAttribute("disabled", "disabled");
+                            }
+                        }
+                    }
+
+                    var check_btn = function() {
+                        for(var j = 0; j < check_list.length; j++) {
+                            if(check_list[j].checked) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }
+</script>
+
+<script> 
+    var btn_tao_tui = document.getElementById("btn_tao_tui");
+    btn_tao_tui.onclick = function() {
+        var product_list = document.querySelectorAll('input[name="check_list"]:checked')
+        product_list = Array.from(product_list);
+        var product_id_list = product_list.map(product => {
+            return {
+                product_id: product.id,
+            }
+        })
+
+        
+        var product_id_list_json = JSON.stringify(product_id_list);
+        var input_product_id_list = document.getElementById("input_product_id_list");
+        input_product_id_list.value = product_id_list_json;
+        console.log(product_id_list_json)
+        var product_list_form = document.getElementById("product_list_form");
+        product_list_form.submit()
+    }
+</script>
+<script>
+
+    var btn_click = function(event) {
+        var btn = event.target;
+        var code_tracking = btn.getAttribute("code");
+        var trang_thai_moi = btn.parentNode.parentNode.parentNode.getElementsByClassName('select_trang_thai')[0].value;
+
+        $.ajax({
+            url: '/transaction_staff/cap_nhap_trang_thai',
+            method: 'POST',
+            data: {
+                code_tracking: code_tracking,
+                trang_thai_moi: trang_thai_moi
+            }
+        })
+        .done(res => {
+            if(res.message) {
+                xac_nhan_thanh_cong();
+            } else {
+                xac_nhan_that_bai();
+            }
+        })
+        .fail(err => {
+            console.log(err)
+            xac_nhan_that_bai();
+        })
+        
+    }
+    $(document).ready(function() {
+        var list_select_trang_thai = document.getElementsByClassName("select_trang_thai")
+        list_select_trang_thai = Array.from(list_select_trang_thai)
+        list_select_trang_thai.forEach(select_trang_thai => {
+            select_trang_thai.onchange = function(event) {
+                var btn = select_trang_thai.parentNode.nextElementSibling.getElementsByClassName('cn_trang_thai')[0];
+                if(select_trang_thai.value!= '--CN Trạng thái--') {
+                    btn.classList.remove('check_btn')
+                    btn.addEventListener('click', btn_click)
+                } else {
+                    btn.classList.add('check_btn')
+                    btn.removeEventListener('click', btn_click)
+                }
+            }
+        }) 
+            
+        
+    })
+    
+</script>
+<script>
+    var xac_nhan_thanh_cong = function() {
+        var Order_Success = document.getElementById('Order_Success')
+        Order_Success.classList.remove('hidden');
+        var order_page = document.getElementById('order_page')
+        order_page.onclick = function(event) {
+            window.location.href = ''
+        }
+    }
+
+    var xac_nhan_that_bai = function() {
+        var Order_failed = document.getElementById('Order_failed')
+        Order_failed.classList.remove('hide');
+        var cart_page = document.getElementById('cart_page')
+        cart_page.onclick = function(event) {
+            window.location.href = ''
+        }
+    }
+</script>
+</html>

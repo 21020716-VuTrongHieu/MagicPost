@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {{!-- <link rel="stylesheet" href="/css/home.css"> --}}
+    <link rel="stylesheet" href="/css/transation_manager.css">
+    {{!-- <link rel="stylesheet" href="/css/find.css"> --}}
+</head>
+<style>
+        #iframeContainer {
+            width: 1300px;
+            height: 918px; /* Chiều cao bạn muốn hiển thị */
+            overflow: hidden; /* Ẩn phần dư thừa */
+        }
+        #myIframe {
+            border: none; /* Loại bỏ đường biên */
+            pointer-events: none; /* Không cho phép tương tác */
+            user-select: none; /* Không cho phép lựa chọn nội dung */
+        }
+    </style>
+<body>
+    
+    <div class="page_container"> 
+        <main class="main_content">
+            <div id="mainContent">
+                <div class="full_container">
+                    <div class="content_title">
+                        TRA CỨU ĐƠN HÀNG
+                    </div>
+                    <div class="tra_cuu_don_hang_manager">
+                        <section class="find-items-content">
+                            <div class="search-code-items" style="background-color: aliceblue;">
+                                <div class="search-items-text">
+                                    <img src="/img/order-search.png" alt="">
+                                    <div>Mã bưu gửi (VD: 655ba7422bef17c718d6489f)</div>
+                                </div>
+                                <div class="search-items-input">
+                                    <form id="form_code_tracking" method="get" action="/transaction_manager/tra_cuu_don">
+                                        <div class="row">
+                                            <div class="col-sm-9">
+                                                <input type="text" name="code_tracking" id="input_code_tracking" placeholder="Nhập mã bưu gửi" value={{tracking_code}}>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button class="btn-find_item">Tra cứu</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            
+                            {{#if found_parcel}}
+                            <div class="order-search-info">
+                                <div class="order-search-info-title">
+                                    <h3>THÔNG TIN BƯU GỬI</h3>
+                                </div>
+                                <div id="iframeContainer">
+                                    <iframe id="myIframe" code={{tracking_code}} src="" frameborder="0" height="1100px" width="1300px"></iframe>
+                                </div>
+                                <div class="order-search-info-top row">
+                                    <div class="order-search-info-top-text col-lg-2 col-sm-3 col-6">
+                                        <div>Code Tracking</div>
+                                        <p>{{tracking_code}}</p>
+                                    </div>
+                                    <div class="order-search-info-top-text col-lg-2 col-sm-3 col-6">
+                                        <div>Khối lượng (kg)</div>
+                                        <p>{{data.weight}}</p>
+                                    </div>
+                                    <div class="order-search-info-top-text col-lg-4 col-sm-3 col-6">
+                                        <div>Nơi gửi</div>
+                                        <p>{{noi_gui}}</p>
+                                    </div>
+                                    <div class="order-search-info-top-text col-lg-4 col-sm-3 col-6">
+                                        <div>Nơi nhận</div>
+                                        <p>{{noi_nhan}}</p>
+                                    </div>
+                                </div>
+                                <div class="order-search-info-middle row">
+                                    <div class="col-lg-4-1 col-sm-6 col-12">
+                                        <div>
+                                            Tỉnh gửi:
+                                            <span>{{data.send_city}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8 col-sm-6 col-12">
+                                        <div>
+                                            Địa chỉ gửi:
+                                            <span>{{data.send_district}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="order-search-info-middle row">
+                                    <div class="col-lg-4-1 col-sm-6 col-12">
+                                        <div>
+                                            Tỉnh Nhận:
+                                            <span>{{data.recipient_city}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8 col-sm-6 col-12">
+                                        <div>
+                                            Địa chỉ nhận:
+                                            <span>{{data.recipient_district}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="order-search-info-bottom row">
+                                    <div class="col-12">
+                                        <div>
+                                            Trạng thái:
+                                            <span>{{trang_thai}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="order-search-info-status">
+                                <div class="order-search-info-status-title">
+                                    <h3>THÔNG TIN TRẠNG THÁI</h3>
+                                </div>
+                                <div class="order-search-info-status-content">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Ngày</th>
+                                                    <th>Giờ</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Vị trí</th>
+                                                    
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each list_trang_thai}}
+                                                <tr>
+                                                    <td>{{sum @index 1}}</td>
+                                                    <td>{{this.ngay}}</td>
+                                                    <td>{{this.gio}}</td>
+                                                    <td>{{this.trang_thai}}</td>
+                                                    <td>{{this.vi_tri}}</td>
+                                                    
+                                                </tr>
+                                                {{/each}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {{else}}
+                            <div id="error_note" style="display:;">
+                                <i style="color: red;">*Không tìm thấy đơn hàng</i>
+                            </div>
+                            {{/if}}
+                        </section>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+<script>
+    var iframe = document.getElementById('myIframe');
+    if(iframe) {
+        var code = iframe.getAttribute("code")
+        iframe.src = `http://localhost:3000/manager/hoadon/${code}`
+    }
+</script>
+</html>

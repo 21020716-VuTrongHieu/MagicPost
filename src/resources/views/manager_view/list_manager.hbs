@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {{!--
+    <link rel="stylesheet" href="home.css"> --}}
+    <link rel="stylesheet" href="/css/manager.css">
+    <link rel="stylesheet" href="/css/list_staff.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function () {
+                if (this.checked) {
+                    checkbox.each(function () {
+                        this.checked = true;
+                    });
+                } else {
+                    checkbox.each(function () {
+                        this.checked = false;
+                    });
+                }
+            });
+            checkbox.click(function () {
+                if (!this.checked) {
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="page_container">
+        <main class="main_content">
+            <div class="full_container">
+                <div class="table-title">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="content_title">
+                                DANH SÁCH NHÂN VIÊN
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"
+                                onclick="cleanForm('addEmployeeModal')"><i class="material-icons">&#xE147;</i>
+                                <span>Thêm tài khoản</span></a>
+                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"
+                                onclick="setValue('')"><i class="material-icons">&#xE15C;</i> <span>Xóa</span></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-xl">
+                    <div class="table-responsive">
+                        <div class="table-wrapper list_container">
+                            <table class="table table-striped table-hover container_product_list list_staff">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <span class="custom-checkbox">
+                                                <input type="checkbox" id="selectAll">
+                                                <label for="selectAll"></label>
+                                            </span>
+                                        </th>
+                                        <th>Họ và tên</th>
+                                        <th>Email</th>
+                                        <th>Tên đăng nhập</th>
+                                        <th>Mật khẩu</th>
+                                        <th>Chức vụ</th>
+                                        <th>Kho</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each data}}
+                                    {{!-- {{#each this}} --}}
+                                    <tr>
+                                        <td>
+                                            <span class="custom-checkbox">
+                                                <input type="checkbox" id="{{_id}}" name="options[]" value="1">
+                                                <label for="checkbox1"></label>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{this.name}}
+                                        </td>
+                                        <td>
+                                            {{this.email}}
+                                        </td>
+                                        <td>
+                                            {{this.username}}
+                                        </td>
+                                        <td>
+                                            {{this.password}}
+                                        </td>
+                                        <td>
+                                            {{#if (eq this.[role] "warehouse_manager")}}
+                                            Quản lý kho
+                                            {{else if (eq this.[role] "transaction_manager")}}
+                                            Trưởng điểm giao dịch
+                                            {{/if}}
+                                        </td>
+                                        <td>
+                                            {{this.postal_name}}
+                                        </td>
+                                        <td>
+                                            <a href="#editEmployeeModal" class="edit" data-toggle="modal"
+                                                onclick="prepareData('{{_id}}')"><i class="material-icons"
+                                                    data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
+                                                onclick="setValue('{{_id}}')"><i class="material-icons"
+                                                    data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                        </td>
+
+                                    </tr>
+                                    {{!-- {{/each}} --}}
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="addEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thêm tài khoản</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" class="form-control form-name" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control form-email" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đăng nhập</label>
+                            <input type="text" class="form-control form-username" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Chức vụ</label>
+                            <select id="office" onchange="loadSubOptions()" class="form-control form-select form-role">
+                                <option value="warehouse">Quản lý kho</option>
+                                <option value="postal_office">Trưởng điểm giao dịch</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ nơi làm việc</label>
+                            <select id="workspace_address" class="form-control form-select form-postal-office">
+
+                                {{!-- -- them option -- --}}
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" class="form-option form-password" required>
+                            <span class="error"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-success" value="Thêm">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal HTML -->
+    <div id="editEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Chỉnh sửa tài khoản</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group" style="display: none !important;">
+                            <label>Id</label>
+                            <input type="text" class="form-control form-id" required disabled readonly>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control form-name" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control form-email" required>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đăng nhập</label>
+                            <input type="text" class="form-control form-username" required readonly disabled>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Chức vụ</label>
+                            <select id="office2" onchange="loadSubOptions2()" class="form-control form-select form-role">
+                                <option value="warehouse">Quản lý kho</option>
+                                <option value="postal_office">Trưởng điểm giao dịch</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ nơi làm việc</label>
+                            <select id="workspace_address2" class="form-control form-select form-postal-office">
+                                {{!-- -- them option -- --}}
+                            </select>
+                            <span class="error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" class="form-control form-password" required>
+                            <span class="error"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-info" value="Lưu">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Modal HTML -->
+    <div id="deleteEmployeeModal" class="modal fade form-container">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Xóa tài khoản</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" disabled readonly hidden>
+                        <p>Bạn chắc chắn muốn xóa những tài khoản này?</p>
+                        <p class="text-warning"><small>Hành động này không thể được hoàn tác.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Thoát">
+                        <input type="submit" class="btn btn-danger" value="Xóa">
+                    </div>
+                    <div class="overlay" id="loadingOverlay"></div>
+                </form>
+                <div id="subOptionsContainer" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+{{!-- add Employee  --}}
+<script>
+    function loadSubOptions(root) {
+        const selectedWorkspace = $('#office').val();
+        const workspaceAddressSelect = $('#workspace_address');
+
+        workspaceAddressSelect.empty();
+        if (selectedWorkspace) {
+            // Simulate fetching options based on the selected workspace using Ajax
+            $.ajax({
+                url: '/manager/getPostalOffice', // Replace with your actual API endpoint
+                method: 'GET',
+                data: { role: selectedWorkspace },
+            }).done(options => {
+                options.forEach(option => {
+                    workspaceAddressSelect.append(`<option value="${option._id}">${option.name}</option>`);
+                });
+            });
+        }
+    }
+
+
+    // Initial loadSubOptions call on page load
+    $(document).ready(function () {
+        loadSubOptions();
+    });
+</script>
+{{!-- edit Employee  --}}
+<script>
+    function loadSubOptions2(root) {
+        const selectedWorkspace = $('#office2').val();
+        const workspaceAddressSelect = $('#workspace_address2');
+
+        workspaceAddressSelect.empty();
+        if (selectedWorkspace) {
+            // Simulate fetching options based on the selected workspace using Ajax
+            $.ajax({
+                url: '/manager/getPostalOffice', // Replace with your actual API endpoint
+                method: 'GET',
+                data: { role: selectedWorkspace },
+            }).done(options => {
+                options.forEach(option => {
+                    workspaceAddressSelect.append(`<option value="${option._id}">${option.name}</option>`);
+                });
+            });
+        }
+    }
+
+
+    // Initial loadSubOptions call on page load
+    $(document).ready(function () {
+        loadSubOptions2();
+    });
+</script>
+<script>
+    function setValue(value) {
+        var temp = document.getElementById('deleteEmployeeModal');
+        var input = temp.querySelector('.modal-body input');
+        input.value = value;
+    }
+    function getValue() {
+        var temp = document.getElementById('deleteEmployeeModal');
+        var input = temp.querySelector('.modal-body input');
+        return input.value;
+    }
+</script>
+
+<script>
+    function cleanForm(id) {
+        var form = document.getElementById(id);
+        var input = form.querySelectorAll('input.form-control');
+        var error = form.querySelectorAll('.error');
+        for (let e of input) {
+            e.value = '';
+        }
+        for (let e of error) {
+            e.innerHTML = '';
+        }
+    }
+</script>
+
+{{!-- Add account --}}
+
+<script>
+    function showOverlay(form_id) {
+        var form = document.getElementById(form_id);
+        form.classList.add('form-loading');
+
+        const overlay = form.querySelector('#loadingOverlay');
+        overlay.style.display = 'block';
+
+        // const loadingText = document.createElement('div');
+        // loadingText.className = 'loading-text';
+        // loadingText.innerHTML = 'Đang xử lý...';
+        // overlay.appendChild(loadingText);
+    }
+
+    function hideOverlay(form_id) {
+        var form = document.getElementById(form_id);
+        form.classList.remove('form-loading');
+
+        const overlay = form.querySelector('#loadingOverlay');
+        overlay.style.display = 'none';
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('addEmployeeModal');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form_id = 'addEmployeeModal';
+            showOverlay(form_id);
+            var name = form.querySelector('input.form-name').value;
+            var email = form.querySelector('input.form-email').value;
+            var username = form.querySelector('input.form-username').value;
+            var password = form.querySelector('input.form-password').value;
+            var role = form.querySelector('select.form-role').value;
+            role = (role === 'warehouse') ? 'warehouse_manager' : 'transaction_manager';
+            var postal_office_code = form.querySelector('select.form-postal-office').value;
+            //{{!-- console.log(role, postal_office_code); --}}
+            $.ajax({
+                url: '/manager/danh_sach_nhan_vien/them_nhan_vien',
+                method: 'POST',
+                data: {
+                    name: name,
+                    email: email,
+                    username: username,
+                    role: role,
+                    password: password,
+                    postal_office_code: postal_office_code
+                }
+            })
+                .done(res => {
+                    // console.log(res);
+                    if (res.status) {
+                        alert("Thêm tài khoản thành công");
+                        // console.log('Hahahaha')
+                        location.reload();
+                    } else {
+                        var temp = form.querySelectorAll('.form-group input');
+                        for (let e of temp) {
+                            var error = e.nextElementSibling;
+                            error.innerHTML = '';
+                        }
+                        hideOverlay(form_id);
+                        if (res.name != '') {
+                            var error = form.querySelector('input.form-name').nextElementSibling;
+                            error.innerHTML = res.name;
+                        } else if (res.email != '') {
+                            var error = form.querySelector('input.form-email').nextElementSibling;
+                            error.innerHTML = res.email;
+                        } else if (res.username != '') {
+                            var error = form.querySelector('input.form-username').nextElementSibling;
+                            error.innerHTML = res.username;
+                        } else if (res.password != '') {
+                            var error = form.querySelector('input.form-password').nextElementSibling;
+                            error.innerHTML = res.password;
+                        } else if(res.postal_office_code != '') {
+                            var error = form.querySelector('select.form-postal-office').nextElementSibling;
+                            console.log(error);
+                            error.innerHTML = res.postal_office_code;
+                        }
+                    }
+                }
+                )
+                .fail(err => {
+                    console.log(err);
+                })
+
+        });
+    });
+</script>
+
+{{!-- Edit account --}}
+
+<script>
+    function prepareData(id) {
+        cleanForm('editEmployeeModal');
+
+        $.ajax(
+            {
+                url: '/manager/danh_sach_nhan_vien/thong_tin_tai_khoan/' + id,
+                method: 'GET',
+            }
+        )
+            .done(response => {
+                console.log(response);
+                var name = response.name;
+                var email = response.email;
+                var username = response.username;
+                var password = response.password;
+                var role = response.role;
+                var postal_office_code = response.postal_office_code;
+
+                var form = document.getElementById('editEmployeeModal');
+                var form_id = form.querySelector('input.form-id');
+                var form_name = form.querySelector('input.form-name');
+                var form_email = form.querySelector('input.form-email');
+                var form_username = form.querySelector('input.form-username');
+                var form_password = form.querySelector('input.form-password');
+                var form_role = form.querySelector('select.form-role');
+                var form_postal_office = form.querySelector('select.form-postal-office');
+
+                form_id.value = id;
+                form_name.value = name;
+                form_email.value = email;
+                form_username.value = username;
+                form_password.value = password;
+                form_postal_office.value = postal_office_code;
+                form_role = role;
+            })
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var form = document.getElementById('editEmployeeModal');
+
+        // Bắt sự kiện (ví dụ: click) và ngăn chặn sự kiện mặc định
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form_id = 'editEmployeeModal';
+            showOverlay(form_id);
+            var id = form.querySelector('input.form-id').value;
+            var name = form.querySelector('input.form-name').value;
+            var email = form.querySelector('input.form-email').value;
+            var username = form.querySelector('input.form-username').value;
+            var password = form.querySelector('input.form-password').value;
+            var role = form.querySelector('select.form-role').value;
+            role = (role === 'warehouse') ? 'warehouse_manager' : 'transaction_manager';
+            var postal_office_code = form.querySelector('select.form-postal-office').value;
+            $.ajax({
+                url: '/manager/danh_sach_nhan_vien/sua_tai_khoan/' + id,
+                method: 'POST',
+                data: {
+                    name: name,
+                    email: email,
+                    username: username,
+                    role: role,
+                    password: password,
+                    postal_office_code: postal_office_code
+                }
+            })
+                .done(res => {
+                    // console.log(res);
+                    if (res.status) {
+                        alert("Sửa tài khoản thành công");
+                        // console.log('Hahahaha')
+                        location.reload();
+                    } else {
+                        hideOverlay(form_id);
+                        var temp = form.querySelectorAll('.form-group input');
+                        for (let e of temp) {
+                            var error = e.nextElementSibling;
+                            error.innerHTML = '';
+                        }
+                        if (res.name != '') {
+                            var error = form.querySelector('input.form-name').nextElementSibling;
+                            error.innerHTML = res.name;
+                        } else if (res.email != '') {
+                            var error = form.querySelector('input.form-email').nextElementSibling;
+                            error.innerHTML = res.email;
+                        } else if (res.username != '') {
+                            var error = form.querySelector('input.form-username').nextElementSibling;
+                            error.innerHTML = res.username;
+                        } else if (res.password != '') {
+                            var error = form.querySelector('input.form-password').nextElementSibling;
+                            error.innerHTML = res.password;
+                        } else if(res.postal_office_code != '') {
+                            var error = form.querySelector('select.form-postal-office').nextElementSibling;
+                            console.log(error);
+                            error.innerHTML = res.postal_office_code;
+                        }
+                    }
+                }
+                )
+                .fail(err => {
+                    console.log(err);
+                })
+
+        });
+    });
+</script>
+
+{{!-- Delete account --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var form = document.getElementById('deleteEmployeeModal');
+
+        // Bắt sự kiện (ví dụ: click) và ngăn chặn sự kiện mặc định
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var tbody = document.querySelector('table tbody');
+            var inputs = tbody.querySelectorAll('.custom-checkbox input');
+            var list_id = [];
+            var value = getValue();
+            if (value == '') {
+                for (var e of inputs) {
+                    if (e.checked) {
+                        list_id.push(e.id);
+                    }
+                }
+            } else {
+                list_id.push(value);
+            }
+            showOverlay('deleteEmployeeModal');
+            if (!list_id.length) {
+                alert("Lỗi: Không có phần tử nào để xóa!");
+                location.reload();
+            } else {
+                $.ajax({
+                    url: '/manager/danh_sach_nhan_vien/xoa_tai_khoan',
+                    method: "DELETE",
+                    data: {
+                        list: list_id,
+                    }
+                })
+                    .done(res => {
+                        alert("Xóa thành công " + res.number + " phần tử.");
+                        location.reload();
+                    })
+                    .fail(err => {
+                        alert(err);
+                        location.reload();
+                    })
+            }
+        });
+    });
+</script>
+
+</html>
